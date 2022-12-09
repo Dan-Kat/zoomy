@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<style>
+html
+{background-color:grey;}
+img
+{
+        height: 75%; width: 75%; object-fit: cover; positon: center;
+}
+body
+{margin:0; padding:0; color:#303030; background-color:grey; font:76% Verdana,Tahoma,sans-serif;}
+
+h1
+{position: absolute; top: 3%; left: 50%; transform: translate(-50%, -50%);color:white;}
+
+#streamwrap
+{position: relative; text-align: center;}
+
+.controlBtn
+{width: 150px;height:60px;border-radius: 12px;background-color: #555555;font-size: 16px;border: 2px solid #e7e7e7;color:white;padding: 15px;margin: 5px;}
+
+.controlBtn:hover 
+{border: 2px solid black;}
+
+#console
+{
+text-align: left; color:white;border-radius:12px;border:2px solid white;  position: absolute; width:250px;height:100%;padding:5px;background-color:black;word-wrap: break-word;overflow:auto;
+}
+
+#btnDiv {
+  position: absolute;
+  z-index: 9;
+  background:transparent;
+  text-align: center;
+  top: 85%;
+  left: 30%;
+}
+
+#btnDivHeader {
+  padding: 5px;
+  cursor: move;
+  z-index: 10;
+  background-color: #2196F3;
+  color: #fff;
+}
+
+</style>
+<body>
+
+<div id="btnDiv">
+<div id="btnDivHeader">Move me!</div>
+<p><button class="controlBtn" id="forwardButton">Forward<br>W</p>
+<p><button class="controlBtn" id="backwardButton">Backward<br>S</p>
+<p><button class="controlBtn" id="leftButton">Left<br>A</p>
+<p><button class="controlBtn" id="rightButton">Right<br>D</p>
+<p><button class="controlBtn" id="stopButton">Stop<br>Space</p>
+</div>
+
+<div id="streamwrap">
+<h1>Zoomy RC Car</h1>
+<pre id="console">
+
+</pre>
+<img id="streamimage" src="http://zoomy:8081/?action=stream" />
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
+<script src="https://www.w3schools.com/lib/w3color.js"></script>
+
+<script>
+var socket = io(); //load socket.io-client and connect to the host that serves the page
+
+window.addEventListener("load", function(){ //when page loads
+  var fButton = document.getElementById("forwardButton");
+  var bButton = document.getElementById("backwardButton");
+  var lButton = document.getElementById("leftButton");
+  var rButton = document.getElementById("rightButton");
+  var sButton = document.getElementById("stopButton");
+  var wIsDown = false;
+  var aIsDown = false;
+  var sIsDown = false;
+  var dIsDown = false;
+  var spIsDown = false;
+
+socket.on('notification', function (data) {
+  if (JSON.stringify(data, null, 4).includes("Speed"))
+  {
+    document.getElementById('btnDivHeader').innerHTML = JSON.stringify(data, null, 4);
+  }
+  else
+  {
+    document.getElementById('console').innerHTML = JSON.stringify(data, null, 4) + "\r\n";
+  }
+});
+
+window.addEventListener("keydown", function (event) {
+
+  switch (event.key) {
+    case "s":
+      if(sIsDown) return;
+      sIsDown = true;	
+      socket.emit("keydown", "backward");
+      document.getElementById("backwardButton").style.backgroundColor="green";
+      break;
+    case "w":
+      if(wIsDown) return;
+      wIsDown = true;	
+      socket.emit("keydown", "forward");
+      document.getElementById("forwardButton").style.backgroundColor="green";
+      break;
+    case "a":
+      if(aIsDown) return;
+      aIsDown = true;	
+      socket.emit("keydown", "left");
+      document.getElementById("leftButton").style.backgroundColor="green";
+      break;
+    case "d":
+      if(dIsDown) return;
+      dIsDown = true;	
+      socket.emit("keydown", "right");
+      document.getElementById("rightButton").style.backgroundColor="green";
+      break;
+    case " ":
+      if(spIsDown) return;
+      spIsDown = true;	
+      socket.emit("keydown", "stop");
+      document.getElementById("stopButton").style.backgroundColor="green";
+      break;
+    case "1":
+      socket.emit("keydown", "low");
+      break;
+    case "2":
+      socket.emit("keydown", "medium");
+      break;
+    case "3":
+      socket.emit("keydown", "high");
+      break;
+    default:
+      return; // Quit when this doesn't handle the key event.
+  }
+});
+
+window.addEventListener("keyup", function (event) {
+
+  switch (event.key) {
+    case "s":
+      if(!sIsDown) return;
+      sIsDown = false;	
+      document.getElementById("backwardButton").style.backgroundColor="#555555";
+      socket.emit("keyup", "backward"); 
+      break;
+    case "w":
+      if(!wIsDown) return;
+      wIsDown = false;	
+      document.getElementById("forwardButton").style.backgroundColor="#555555";
+      socket.emit("keyup", "forward");
+      break;
+    case "a":
+      if(!aIsDown) return;
+      aIsDown = false;	
+      document.getElementById("leftButton").style.backgroundColor="#555555";
+      socket.emit("keyup", "left"); 
+      break;
+    case "d":
+      if(!dIsDown) return;
+      dIsDown = false;	
+      document.getElementById("rightButton").style.backgroundColor="#555555";
+      socket.emit("keyup", "right"); 
+      break;
+    case " ":
+      if(!spIsDown) return;
+      spIsDown = false;	
+      document.getElementById("stopButton").style.backgroundColor="#555555";
+      socket.emit("keyup", "stop");
+      break;
+    default:
+      return; // Quit when this doesn't handle the key event.
+  }
+});
+
+  sButton.addEventListener("click", function() {
+      if(spIsDown) return;
+      spIsDown = true;
+      document.getElementById("stopButton").style.backgroundColor="green";	
+      socket.emit("keydown", "stop");
+      spIsDown = false;
+      document.getElementById("stopButton").style.backgroundColor="#555555";
+      socket.emit("keyup", "stop"); 
+  });
+
+  fButton.addEventListener("click", function() {
+      if(wIsDown) return;
+      wIsDown = true;
+      document.getElementById("forwardButton").style.backgroundColor="green";	
+      socket.emit("keydown", "forward");
+      wIsDown = false;
+      document.getElementById("forwardButton").style.backgroundColor="#555555";
+      socket.emit("keyup", "forward"); 
+  });
+
+  bButton.addEventListener("click", function() { 
+      if(sIsDown) return;
+      sIsDown = true;
+      document.getElementById("backwardButton").style.backgroundColor="green";	
+      socket.emit("keydown", "backward");
+      sIsDown = false;
+      document.getElementById("backwardButton").style.backgroundColor="#555555";
+      socket.emit("keyup", "backward"); 
+  });
+
+  lButton.addEventListener("click", function() { 
+      if(aIsDown) return;
+      aIsDown = true;
+      document.getElementById("leftButton").style.backgroundColor="green";	
+      socket.emit("keydown", "left");
+      aIsDown = false;
+      document.getElementById("leftButton").style.backgroundColor="#555555";
+      socket.emit("keyup", "left"); 
+  });
+
+  rButton.addEventListener("click", function() { 
+      if(dIsDown) return;
+      dIsDown = true;
+      document.getElementById("rightButton").style.backgroundColor="green";	
+      socket.emit("keydown", "right");
+      dIsDown = false;
+      document.getElementById("rightButton").style.backgroundColor="#555555";
+      socket.emit("keyup", "right"); 
+  });
+
+});
+// Make the DIV element draggable:
+dragElement(document.getElementById("btnDiv"));
+
+function dragElement(elmnt) {
+  var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+  if (document.getElementById(elmnt.id + "Header")) {
+    // if present, the header is where you move the DIV from:
+    document.getElementById(elmnt.id + "Header").onmousedown = dragMouseDown;
+  } else {
+    // otherwise, move the DIV from anywhere inside the DIV:
+    elmnt.onmousedown = dragMouseDown;
+  }
+
+  function dragMouseDown(e) {
+    e = e || window.event;
+    e.preventDefault();
+    // get the mouse cursor position at startup:
+    pos3 = e.clientX;
+    pos4 = e.clientY;
+    document.onmouseup = closeDragElement;
+    // call a function whenever the cursor moves:
+    document.onmousemove = elementDrag;
+  }
+
+  function elementDrag(e) {
+    e = e || window.event;
+    e.preventDefault();
+    // calculate the new cursor position:
+    pos1 = pos3 - e.clientX;
+    pos2 = pos4 - e.clientY;
+    pos3 = e.clientX;
+    pos4 = e.clientY;
+    // set the element's new position:
+    elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
+    elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+  }
+
+  function closeDragElement() {
+    // stop moving when mouse button is released:
+    document.onmouseup = null;
+    document.onmousemove = null;
+  }
+}
+</script>
+
+</body>
+</html> 
