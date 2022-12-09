@@ -18,10 +18,10 @@ Hardware:
  
 Software:  
 
-node  
-mjpg-streamer  
-socket.io  
-pigpio  
+node (https://github.com/nodejs/node)  
+mjpg-streamer (https://github.com/jacksonliam/mjpg-streamer)  
+socket.io (https://github.com/socketio/socket.io)  
+pigpio (https://github.com/fivdi/pigpio)  
 
 Startup:  
 
