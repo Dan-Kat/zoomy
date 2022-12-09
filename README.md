@@ -1,6 +1,6 @@
 # RC RPi Car
 
-This is a work in process.  
+This is a work in process, will fill in more details on assembly at some point.  
 
 Hardware:  
 
@@ -20,3 +20,9 @@ node
 mjpg-streamer  
 socket.io  
 pigpio  
+
+Startup:  
+
+./mjpeg_streamer_launch.sh  
+sudo node --inspect webserver.js  
+navigate to http://zoomy:8080 and use WASD to control, 1/2/3 for LOW/MEDIUM/HIGH speed.
