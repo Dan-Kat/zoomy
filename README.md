@@ -4,6 +4,8 @@ This is a work in process, will fill in more details on assembly at some point.
 
 Zoomy is a remote control and video stream host for Raspberry Pi, allowing you to control an RC car over WiFi w/ a video feed. This setup can integrate to just about any smaller RC car, and should run fine on any Raspberry Pi that has onboard wireless, otherwise you'll need to supply a WiFi dongle. 
 
+I found mjpg-streamer to have the fastest frame rate and latency by default.  
+
 Hardware:  
 
  1x Cheap amazon RC car (https://www.amazon.com/gp/product/B07X8773JJ)     
